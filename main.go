@@ -2,7 +2,10 @@ package main
 
 import (
 	"net/http"
+	"os"
 )
+
+var port = os.Getenv("PORT")
 
 func main() {
 
@@ -10,5 +13,5 @@ func main() {
 
 	http.HandleFunc("/toggleitem", apiHandler)
 
-	http.ListenAndServe(":3000", nil)
+	http.ListenAndServe(":"+port, nil)
 }
