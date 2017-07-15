@@ -22,5 +22,7 @@ func main() {
 
 	http.HandleFunc("/login", loginHandler(db))
 
+	http.HandleFunc("/item/create", createItemHandler(db))
+
 	http.ListenAndServe(":"+port, nil)
 }
