@@ -13,7 +13,7 @@ func login(res http.ResponseWriter, req *http.Request) {
 	username := req.FormValue("username")
 	password := req.FormValue("password")
 
-	passwordHash := fmt.Sprintf("%v", sha256.Sum256([]byte(password)))
+	passwordHash := fmt.Sprintf("%x", sha256.Sum256([]byte(password)))
 
 	res.Write([]byte(username + " - " + passwordHash))
 }
