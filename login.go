@@ -8,12 +8,17 @@ import (
 	"net/http"
 )
 
+func pwHash(password string) string {
+	// need to add some salt
+	return fmt.Sprintf("%x", sha256.Sum256([]byte(password)))
+}
+
 func login(res http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 	username := req.FormValue("username")
 	password := req.FormValue("password")
 
-	passwordHash := fmt.Sprintf("%x", sha256.Sum256([]byte(password)))
+	passwordHash := pwHash(password)
 
 	res.Write([]byte(username + " - " + passwordHash))
 }
