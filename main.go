@@ -18,9 +18,9 @@ func main() {
 		log.Fatal(err)
 	}
 
+	http.HandleFunc("/toggleitem/", apiHandler(db))
+
 	http.HandleFunc("/login", loginHandler(db))
 
-	http.HandleFunc("/toggleitem/	", apiHandler(db))
-
-	http.ListenAndServe(":"+port, nil)
+	http.ListenAndServe(":8080", nil)
 }
