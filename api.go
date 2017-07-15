@@ -13,7 +13,8 @@ func apiHandler(db *sql.DB) func(res http.ResponseWriter, req *http.Request) {
 		// if credentials are correct, toggle item
 		// db.Query("UPDATE items WHERE user = user.id AND key = keyPressed SET own = NOT own")
 
-		log.Print(httputil.DumpRequest(req, true))
+		x, _ := httputil.DumpRequest(req, true)
+		log.Printf("%v", x)
 
 		res.WriteHeader(200)
 	}
