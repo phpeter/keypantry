@@ -1,6 +1,8 @@
 package main
 
 import (
+	"crypto/sha256"
+	"database/sql"
 	"html/template"
 	"net/http"
 )
@@ -9,22 +11,28 @@ func login(res http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 	username := req.FormValue("username")
 	password := req.FormValue("password")
-	res.Write([]byte(username + " - " + password))
+
+	passwordHash := sha256.Sum256([]byte(password))
+
+	res.Write([]byte(username + " - " + passwordHash))
 }
 
-func loginHandler(res http.ResponseWriter, req *http.Request) {
-	tmpl, err := template.ParseGlob("templates/*.html")
+func loginHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
 
-	if err != nil {
-		panic("error parsing templates " + err.Error())
-	}
+	return func(res http.ResponseWriter, req *http.Request) {
+		tmpl, err := template.ParseGlob("templates/*.html")
 
-	switch req.Method {
+		if err != nil {
+			panic("error parsing templates " + err.Error())
+		}
 
-	case "POST":
-		login(res, req)
-	case "GET":
-		tmpl.ExecuteTemplate(res, "login", nil)
+		switch req.Method {
 
+		case "POST":
+			login(res, req)
+		case "GET":
+			tmpl.ExecuteTemplate(res, "login", nil)
+
+		}
 	}
 }
