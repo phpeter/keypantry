@@ -19,6 +19,6 @@ func apiHandler(db *sql.DB) func(res http.ResponseWriter, req *http.Request) {
 
 		res.Write([]byte(username + " - " + password))
 
-		res.WriteHeader(200)
+		// res.WriteHeader(200)
 	}
 }
