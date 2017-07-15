@@ -1,0 +1,6 @@
+{
+	"ImportPath": "github.com/phpeter/keypantry",
+	"GoVersion": "go1.8",
+	"GodepVersion": "v79",
+	"Deps": []
+}
