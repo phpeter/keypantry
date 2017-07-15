@@ -35,7 +35,12 @@ func apiHandler(db *sql.DB) func(res http.ResponseWriter, req *http.Request) {
 			params := strings.Split(path, "/")
 			keyPressed := params[len(params)-1]
 
-			db.Query("UPDATE items WHERE userID=$1 AND key=$2 SET isOwned = NOT isOwned", userID, keyPressed)
+			log.Print("user id is " + string(userID))
+
+			_, err = db.Query("UPDATE items SET isOwned = NOT isOwned WHERE userID=$1 AND key=$2", userID, keyPressed)
+			if err != nil {
+				log.Print(err)
+			}
 			res.Write([]byte("Good!"))
 		}
 
