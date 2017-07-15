@@ -19,8 +19,8 @@ func apiHandler(db *sql.DB) func(res http.ResponseWriter, req *http.Request) {
 		var userPw string
 		err := row.Scan(&userPw)
 
-		if err != nil {
-			log.Fatal("Error getting user password for API call " + err.Error())
+		if err == sql.ErrNoRows {
+			res.Write([]byte("Incorrect username!!!!!!!"))
 		}
 
 		if pwHash(password) == userPw {
