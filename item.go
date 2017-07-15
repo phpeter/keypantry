@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func creatItemHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
+func createItemHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
 
 	return func(res http.ResponseWriter, req *http.Request) {
 		tmpl, err := template.ParseGlob("templates/*.html")
