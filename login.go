@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/sha256"
 	"database/sql"
+	"fmt"
 	"html/template"
 	"net/http"
 )
@@ -12,7 +13,7 @@ func login(res http.ResponseWriter, req *http.Request) {
 	username := req.FormValue("username")
 	password := req.FormValue("password")
 
-	passwordHash := sha256.Sum256([]byte(password))
+	passwordHash := fmt.Sprintf("%v", sha256.Sum256([]byte(password)))
 
 	res.Write([]byte(username + " - " + passwordHash))
 }
