@@ -11,7 +11,7 @@ func main() {
 
 	http.HandleFunc("/login", loginHandler)
 
-	http.HandleFunc("/toggleitem", apiHandler)
+	http.HandleFunc("/toggleitem/", apiHandler)
 
 	http.ListenAndServe(":"+port, nil)
 }
