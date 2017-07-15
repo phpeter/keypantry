@@ -22,5 +22,5 @@ func main() {
 
 	http.HandleFunc("/login", loginHandler(db))
 
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":"+port, nil)
 }
