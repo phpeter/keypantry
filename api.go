@@ -14,7 +14,7 @@ func apiHandler(db *sql.DB) func(res http.ResponseWriter, req *http.Request) {
 		// db.Query("UPDATE items WHERE user = user.id AND key = keyPressed SET own = NOT own")
 
 		x, _ := httputil.DumpRequest(req, true)
-		log.Printf("%v", x)
+		log.Print(string(x))
 
 		res.WriteHeader(200)
 	}
