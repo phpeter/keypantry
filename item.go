@@ -32,6 +32,8 @@ func viewItemsHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
 
 		}
 
+		log.Print(itemList)
+
 		tmpl.ExecuteTemplate(res, "itemList", itemList)
 	}
 }
