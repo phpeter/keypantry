@@ -7,6 +7,11 @@ import (
 	"strings"
 )
 
+func getLastParam(path string) string {
+	params := strings.Split(path, "/")
+	return params[len(params)-1]
+}
+
 func apiHandler(db *sql.DB) func(res http.ResponseWriter, req *http.Request) {
 	return func(res http.ResponseWriter, req *http.Request) {
 		// x, _ := httputil.DumpRequest(req, true)
@@ -31,9 +36,7 @@ func apiHandler(db *sql.DB) func(res http.ResponseWriter, req *http.Request) {
 				log.Print("Error, no user found")
 			}
 
-			path := req.URL.Path
-			params := strings.Split(path, "/")
-			keyPressed := params[len(params)-1]
+			keyPressed := getLastParam(req.URL.Path)
 
 			log.Print("user id is " + string(userID))
 

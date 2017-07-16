@@ -33,6 +33,14 @@ func main() {
 
 	http.HandleFunc("/item/list", viewItemsHandler(db))
 
+	http.HandleFunc("/item/delete/", deleteItemHandler(db))
+
+	http.HandleFunc("/item/edit/", editItemHandler(db))
+
+	http.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
+		http.Redirect(res, req, "/item/list", http.StatusPermanentRedirect)
+	})
+
 	log.Print("Running on port " + port)
 	http.ListenAndServe(":"+port, nil)
 }
