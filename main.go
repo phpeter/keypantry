@@ -31,7 +31,7 @@ func main() {
 
 	http.HandleFunc("/item/create", createItemHandler(db))
 
-	http.HandleFunc("/item/create", viewItemsHandler(db))
+	http.HandleFunc("/item/list", viewItemsHandler(db))
 
 	http.ListenAndServe(":"+port, nil)
 }
