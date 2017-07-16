@@ -9,7 +9,7 @@ import (
 type Item struct {
 	ID      int
 	Name    string
-	Key     int
+	Key     string
 	IsOwned bool
 }
 
