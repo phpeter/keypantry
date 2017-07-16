@@ -1,0 +1,27 @@
+{{ define "itemList" }}
+{{ template "header" }}
+
+<table class="table">
+
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Key</th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+
+  {{ range . }}
+  <tr>
+    <td>{{ .Name }}</td>
+    <td>{{ .Key }}</td>
+    <td></td>
+  {{ end }}
+  </tbody>
+
+</table>
+
+{{ template "footer" }}
+{{ end }}

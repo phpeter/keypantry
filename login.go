@@ -4,7 +4,6 @@ import (
 	"crypto/sha256"
 	"database/sql"
 	"fmt"
-	"html/template"
 	"net/http"
 )
 
@@ -26,11 +25,6 @@ func login(res http.ResponseWriter, req *http.Request) {
 func loginHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
 
 	return func(res http.ResponseWriter, req *http.Request) {
-		tmpl, err := template.ParseGlob("templates/*.html")
-
-		if err != nil {
-			panic("error parsing templates " + err.Error())
-		}
 
 		switch req.Method {
 

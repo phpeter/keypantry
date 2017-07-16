@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -11,7 +12,13 @@ import (
 
 var port = os.Getenv("PORT")
 
+var tmpl, tmplErr = template.ParseGlob("templates/*.html")
+
 func main() {
+
+	if tmplErr != nil {
+		panic("Error parsing template: " + tmplErr.Error())
+	}
 
 	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	if err != nil {
@@ -23,6 +30,8 @@ func main() {
 	http.HandleFunc("/login", loginHandler(db))
 
 	http.HandleFunc("/item/create", createItemHandler(db))
+
+	http.HandleFunc("/item/create", viewItemsHandler(db))
 
 	http.ListenAndServe(":"+port, nil)
 }
