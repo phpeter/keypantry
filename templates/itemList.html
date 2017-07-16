@@ -17,7 +17,13 @@
   <tr>
     <td>{{ .Name }}</td>
     <td>{{ .KeyChar }}</td>
-    <td></td>
+    <td>
+      <div class="btn-group">
+        <a href="/item/edit/{{.ID}}" class="btn btn-secondary btn-sm">Edit</a>
+        <a href="/item/delete/{{.ID}}" class="btn btn-danger btn-sm">Delete</a>
+      </div>
+    </td>
+  </tr>
   {{ end }}
   </tbody>
 
