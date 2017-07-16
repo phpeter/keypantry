@@ -10,19 +10,32 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var port = os.Getenv("PORT")
+var environment = os.Getenv("ENVIRONMENT")
 
 var tmpl, tmplErr = template.ParseGlob("templates/*.html")
 
 func main() {
 
-	if tmplErr != nil {
-		panic("Error parsing template: " + tmplErr.Error())
-	}
+	// declare port, db, and err variables so we can use them later on
+	var port string
+	var db *sql.DB
+	var err error
 
-	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
+	// set up port and DB connection based on environment
+	if environment == "production" {
+		port = os.Getenv("PORT")
+		db, err = sql.Open("postgres", os.Getenv("DATABASE_URL"))
+	} else {
+		port = "8080"
+		db, err = sql.Open("postgres", "postgresql://localhost:5432/peter?sslmode=disable")
+	}
+	// catch DB connection error
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	if tmplErr != nil {
+		panic("Error parsing template: " + tmplErr.Error())
 	}
 
 	http.HandleFunc("/toggleitem/", apiHandler(db))
@@ -33,5 +46,6 @@ func main() {
 
 	http.HandleFunc("/item/list", viewItemsHandler(db))
 
+	log.Print("Running on port " + port)
 	http.ListenAndServe(":"+port, nil)
 }

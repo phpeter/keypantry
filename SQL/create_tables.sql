@@ -27,3 +27,4 @@ CREATE TABLE IF NOT EXISTS items (
 );
 
 INSERT INTO users (username, passwordHash) VALUES ('tindell', '6ca13d52ca70c883e0f0bb101e425a89e8624de51db2d2392593af6a84118090');
+INSERT INTO items (name, userId, key) VALUES ('Cilantro', 1, 97);
