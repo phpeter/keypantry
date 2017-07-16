@@ -9,14 +9,14 @@ import (
 type Item struct {
 	ID      int
 	Name    string
-	key     int
-	isOwned bool
+	Key     int
+	IsOwned bool
 }
 
 func viewItemsHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
 	return func(res http.ResponseWriter, req *http.Request) {
 
-		items, err := db.Query("SELECT id, name, key, isOwned FROM items")
+		items, err := db.Query("SELECT id, name, key, isowned FROM items")
 		var itemList []Item
 
 		if err != nil {
@@ -26,7 +26,7 @@ func viewItemsHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
 			var tempItem Item
 
 			for items.Next() {
-				items.Scan(&tempItem)
+				items.Scan(&tempItem.ID, &tempItem.Name, &tempItem.Key, &tempItem.IsOwned)
 				itemList = append(itemList, tempItem)
 			}
 
