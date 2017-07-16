@@ -9,8 +9,9 @@ import (
 type Item struct {
 	ID      int
 	Name    string
-	Key     rune
+	Key     byte
 	IsOwned bool
+	KeyChar string
 }
 
 func viewItemsHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
@@ -27,6 +28,7 @@ func viewItemsHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
 
 			for items.Next() {
 				items.Scan(&tempItem.ID, &tempItem.Name, &tempItem.Key, &tempItem.IsOwned)
+				tempItem.KeyChar = string(tempItem.Key)
 				itemList = append(itemList, tempItem)
 			}
 
