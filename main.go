@@ -10,25 +10,12 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var environment = os.Getenv("ENVIRONMENT")
-
 var tmpl, tmplErr = template.ParseGlob("templates/*.html")
 
 func main() {
 
-	// declare port, db, and err variables so we can use them later on
-	var port string
-	var db *sql.DB
-	var err error
-
-	// set up port and DB connection based on environment
-	if environment == "production" {
-		port = os.Getenv("PORT")
-		db, err = sql.Open("postgres", os.Getenv("DATABASE_URL"))
-	} else {
-		port = "8080"
-		db, err = sql.Open("postgres", "postgresql://localhost:5432/peter?sslmode=disable")
-	}
+	port := os.Getenv("PORT")
+	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	// catch DB connection error
 	if err != nil {
 		log.Fatal(err)
