@@ -62,6 +62,7 @@ func logoutHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
 		c, err := req.Cookie("session")
 		if err != nil {
 			log.Print("Error getting session cookie: " + err.Error())
+			loginRedirect(res, req)
 		}
 		// if cookie is set, get sesion key
 		sessionKey := c.Value
