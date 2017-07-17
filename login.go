@@ -85,7 +85,7 @@ func logoutHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
 		sessionKey := c.Value
 
 		// delete  session key from db
-		_, err = db.Query("DELETE FROM usersession WHERE key=$1", sessionKey)
+		_, err = db.Query("DELETE FROM usersession WHERE sessionkey=$1", sessionKey)
 		if err != nil {
 			log.Print("Error deleting session from DB: " + err.Error())
 		}
