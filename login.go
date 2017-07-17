@@ -11,6 +11,18 @@ func loginHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
 
 	return func(res http.ResponseWriter, req *http.Request) {
 
+		c, err := req.Cookie("session")
+		if err != nil {
+			sessionKey := c.Value
+			var userID int
+			session := db.QueryRow("SELECT userid FROM usersession WHERE sessionkey=$1", sessionKey)
+			err = session.Scan(&userID)
+			if err == nil {
+				http.Redirect(res, req, "/item/list", http.StatusTemporaryRedirect)
+				return
+			}
+		}
+
 		switch req.Method {
 
 		case "POST":
