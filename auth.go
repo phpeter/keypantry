@@ -26,10 +26,6 @@ func pwHash(password string, salt string) string {
 	return fmt.Sprintf("%x", sha256.Sum256([]byte(password+salt)))
 }
 
-func loginRedirect(res http.ResponseWriter, req *http.Request) {
-	http.Redirect(res, req, "/login", http.StatusUnauthorized)
-}
-
 func auth(handler func(*sql.DB, *Context) func(res http.ResponseWriter, req *http.Request), db *sql.DB) func(res http.ResponseWriter, req *http.Request) {
 	return func(res http.ResponseWriter, req *http.Request) {
 

@@ -7,6 +7,10 @@ import (
 	"time"
 )
 
+func loginRedirect(res http.ResponseWriter, req *http.Request) {
+	http.Redirect(res, req, "/login", http.StatusTemporaryRedirect)
+}
+
 func loginHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
 
 	return func(res http.ResponseWriter, req *http.Request) {
