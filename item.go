@@ -14,10 +14,10 @@ type Item struct {
 	KeyChar string
 }
 
-func viewItemsHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
+func viewItemsHandler(db *sql.DB, ctx *Context) func(http.ResponseWriter, *http.Request) {
 	return func(res http.ResponseWriter, req *http.Request) {
 
-		items, err := db.Query("SELECT id, name, key, isowned FROM items")
+		items, err := db.Query("SELECT id, name, key, isowned FROM items WHERE userid=$1", ctx.UserID)
 		var itemList []Item
 
 		if err != nil {
@@ -36,11 +36,18 @@ func viewItemsHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
 
 		log.Print(itemList)
 
-		tmpl.ExecuteTemplate(res, "itemList", itemList)
+		tmpl.ExecuteTemplate(res, "itemList",
+			struct {
+				Context  *Context
+				ItemList []Item
+			}{
+				Context:  ctx,
+				ItemList: itemList,
+			})
 	}
 }
 
-func createItemHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
+func createItemHandler(db *sql.DB, ctx *Context) func(http.ResponseWriter, *http.Request) {
 	return func(res http.ResponseWriter, req *http.Request) {
 
 		switch req.Method {
@@ -49,7 +56,7 @@ func createItemHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
 			req.ParseForm()
 			itemName := req.FormValue("name")
 			itemKey := req.FormValue("key")
-			_, err := db.Query("INSERT INTO items (name, key) VALUES ($1, $2)", itemName, itemKey)
+			_, err := db.Query("INSERT INTO items (name, key, userid) VALUES ($1, $2, $3)", itemName, itemKey, ctx.UserID)
 			if err != nil {
 				res.Write([]byte("There was an error creating that item: " + err.Error()))
 			} else {
@@ -62,7 +69,7 @@ func createItemHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
 	}
 }
 
-func deleteItemHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
+func deleteItemHandler(db *sql.DB, ctx *Context) func(http.ResponseWriter, *http.Request) {
 	return func(res http.ResponseWriter, req *http.Request) {
 		itemID := getLastParam(req.URL.Path)
 		_, err := db.Query("DELETE FROM items WHERE id=$1", itemID)
@@ -74,7 +81,7 @@ func deleteItemHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
 	}
 }
 
-func editItemHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
+func editItemHandler(db *sql.DB, ctx *Context) func(http.ResponseWriter, *http.Request) {
 	return func(res http.ResponseWriter, req *http.Request) {
 
 		itemID := getLastParam(req.URL.Path)
@@ -98,7 +105,13 @@ func editItemHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
 			if err != nil {
 				res.Write([]byte("There was an error finding item number " + itemID + ": " + err.Error()))
 			} else {
-				tmpl.ExecuteTemplate(res, "editItem", item)
+				tmpl.ExecuteTemplate(res, "editItem", struct {
+					Context *Context
+					Item    Item
+				}{
+					Context: ctx,
+					Item:    item,
+				})
 			}
 
 		}

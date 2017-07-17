@@ -1,5 +1,5 @@
 {{ define "editItem" }}
-{{ template "header" }}
+{{ template "header" .Context }}
 
 <form action="" method="post">
 
@@ -7,12 +7,12 @@
 
   <div class="form-group">
     <label for="name">Name:</label>
-    <input type="text" class="form-control" name="name" id="name" value="{{.Name}}">
+    <input type="text" class="form-control" name="name" id="name" value="{{.Item.Name}}">
   </div>
 
  <div class="form-group">
     <label for="key">Key:</label>
-    <input type="text" class="form-control" name="key" id="key" value="{{.Key}}">
+    <input type="text" class="form-control" name="key" id="key" value="{{.Item.Key}}">
   </div>
 
   <div class="form-group">

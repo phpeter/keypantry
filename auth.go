@@ -8,6 +8,11 @@ import (
 	"net/http"
 )
 
+type Context struct {
+	UserID   int
+	LoggedIn bool
+}
+
 func randKey(chars int) string {
 	b := make([]byte, chars)
 	if _, err := rand.Read(b); err != nil {
@@ -25,22 +30,27 @@ func loginRedirect(res http.ResponseWriter, req *http.Request) {
 	http.Redirect(res, req, "/login", http.StatusUnauthorized)
 }
 
-func auth(handler func(db *sql.DB) func(res http.ResponseWriter, req *http.Request), db *sql.DB) func(res http.ResponseWriter, req *http.Request) {
+func auth(handler func(*sql.DB, *Context) func(res http.ResponseWriter, req *http.Request), db *sql.DB) func(res http.ResponseWriter, req *http.Request) {
 	return func(res http.ResponseWriter, req *http.Request) {
+
+		ctx := &Context{}
 
 		c, err := req.Cookie("session")
 		if err != nil {
 			loginRedirect(res, req)
 		} else {
 			sessionKey := c.Value
-			session := db.QueryRow("SELECT FROM usersession WHERE sessionkey=$1", sessionKey)
-			err = session.Scan()
+			var userID int
+			session := db.QueryRow("SELECT userid FROM usersession WHERE sessionkey=$1", sessionKey)
+			err = session.Scan(&userID)
 			if err == sql.ErrNoRows {
 				loginRedirect(res, req)
 			} else if err != nil {
 				res.Write([]byte("Error! " + err.Error()))
 			} else {
-				handler(db)(res, req)
+				ctx.LoggedIn = true
+				ctx.UserID = userID
+				handler(db, ctx)(res, req)
 			}
 		}
 	}

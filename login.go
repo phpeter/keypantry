@@ -24,6 +24,8 @@ func loginHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
 			pw := db.QueryRow("SELECT id, passwordHash FROM users WHERE username=$1", username)
 			err := pw.Scan(&userID, &userPasswordHash)
 
+			log.Print(username + " : " + passwordHash)
+
 			if err == sql.ErrNoRows {
 				res.Write([]byte("Error! Wrong username."))
 			} else if err != nil {

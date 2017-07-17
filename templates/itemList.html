@@ -1,5 +1,5 @@
 {{ define "itemList" }}
-{{ template "header" }}
+{{ template "header" .Context }}
 
 <table class="table">
 
@@ -21,7 +21,7 @@
     </form>
   </tr>
 
-  {{ range . }}
+  {{ range .ItemList }}
   <tr>
     <td>{{ .Name }}</td>
     <td>{{ .KeyChar }}</td>
