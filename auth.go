@@ -31,17 +31,17 @@ func auth(handler func(db *sql.DB) func(res http.ResponseWriter, req *http.Reque
 		c, err := req.Cookie("session")
 		if err != nil {
 			loginRedirect(res, req)
-		}
-
-		sessionKey := c.Value
-		session := db.QueryRow("SELECT FROM usersession WHERE sessionkey=$1", sessionKey)
-		err = session.Scan()
-		if err == sql.ErrNoRows {
-			loginRedirect(res, req)
-		} else if err != nil {
-			res.Write([]byte("Error! " + err.Error()))
 		} else {
-			handler(db)(res, req)
+			sessionKey := c.Value
+			session := db.QueryRow("SELECT FROM usersession WHERE sessionkey=$1", sessionKey)
+			err = session.Scan()
+			if err == sql.ErrNoRows {
+				loginRedirect(res, req)
+			} else if err != nil {
+				res.Write([]byte("Error! " + err.Error()))
+			} else {
+				handler(db)(res, req)
+			}
 		}
 	}
 }
