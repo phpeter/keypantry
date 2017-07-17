@@ -24,7 +24,7 @@ func apiHandler(db *sql.DB) func(res http.ResponseWriter, req *http.Request) {
 		var userPw string
 		err := row.Scan(&userPw)
 
-		if err == sql.ErrNoRows || pwHash(password) != userPw {
+		if err == sql.ErrNoRows || pwHash(password, username) != userPw {
 			res.Write([]byte("Bad credentials!"))
 		} else {
 
