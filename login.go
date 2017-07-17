@@ -12,7 +12,7 @@ func loginHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
 	return func(res http.ResponseWriter, req *http.Request) {
 
 		c, err := req.Cookie("session")
-		if err != nil && c == nil {
+		if err == nil && c != nil {
 			sessionKey := c.Value
 			var userID int
 			session := db.QueryRow("SELECT userid FROM usersession WHERE sessionkey=$1", sessionKey)
