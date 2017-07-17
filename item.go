@@ -72,7 +72,7 @@ func createItemHandler(db *sql.DB, ctx *Context) func(http.ResponseWriter, *http
 func deleteItemHandler(db *sql.DB, ctx *Context) func(http.ResponseWriter, *http.Request) {
 	return func(res http.ResponseWriter, req *http.Request) {
 		itemID := getLastParam(req.URL.Path)
-		_, err := db.Query("DELETE FROM items WHERE id=$1", itemID)
+		_, err := db.Query("DELETE FROM items WHERE id=$1 AND userid=$2", itemID, ctx.UserID)
 		if err != nil {
 			res.Write([]byte("There was an error deleting item number " + itemID + ": " + err.Error()))
 		} else {
@@ -92,7 +92,7 @@ func editItemHandler(db *sql.DB, ctx *Context) func(http.ResponseWriter, *http.R
 			req.ParseForm()
 			itemName := req.FormValue("name")
 			itemKey := req.FormValue("key")
-			_, err := db.Query("UPDATE items SET name=$1, key=$2 WHERE id=$3", itemName, itemKey, itemID)
+			_, err := db.Query("UPDATE items SET name=$1, key=$2 WHERE id=$3 AND userid=$4", itemName, itemKey, itemID, ctx.UserID)
 			if err != nil {
 				res.Write([]byte("There was an error updating that item: " + err.Error()))
 			} else {
@@ -100,7 +100,7 @@ func editItemHandler(db *sql.DB, ctx *Context) func(http.ResponseWriter, *http.R
 			}
 		case "GET":
 			var item Item
-			row := db.QueryRow("SELECT name, key FROM items WHERE id=$1", itemID)
+			row := db.QueryRow("SELECT name, key FROM items WHERE id=$1 AND userid=$2", itemID, ctx.UserID)
 			err := row.Scan(&item.Name, &item.Key)
 			if err != nil {
 				res.Write([]byte("There was an error finding item number " + itemID + ": " + err.Error()))
