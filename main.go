@@ -25,18 +25,15 @@ func main() {
 		panic("Error parsing template: " + tmplErr.Error())
 	}
 
-	http.HandleFunc("/item/list", auth(viewItemsHandler, db))
-
-	http.HandleFunc("/toggleitem/", apiHandler(db))
-
 	http.HandleFunc("/login", loginHandler(db))
 	http.HandleFunc("/logout", logoutHandler(db))
 
-	http.HandleFunc("/item/create", createItemHandler(db))
+	http.HandleFunc("/toggleitem/", apiHandler(db))
 
-	http.HandleFunc("/item/delete/", deleteItemHandler(db))
-
-	http.HandleFunc("/item/edit/", editItemHandler(db))
+	http.HandleFunc("/item/list", auth(viewItemsHandler, db))
+	http.HandleFunc("/item/create", auth(createItemHandler, db))
+	http.HandleFunc("/item/delete/", auth(deleteItemHandler, db))
+	http.HandleFunc("/item/edit/", auth(editItemHandler, db))
 
 	// redirect from root URL to login screen or item list
 	http.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
