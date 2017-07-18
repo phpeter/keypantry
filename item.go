@@ -22,10 +22,10 @@ func viewItemsHandler(db *sql.DB, ctx *Context) func(http.ResponseWriter, *http.
 		var view string
 		if ownedQuery == "true" {
 			view = "owned"
-			querySuff = " AND isowned=true"
+			querySuff = " AND isowned=TRUE"
 		} else if ownedQuery == "false" {
 			view = "notowned"
-			querySuff = " AND isowned=false"
+			querySuff = " AND isowned=FALSE"
 		} else {
 			view = "all"
 		}
@@ -69,7 +69,7 @@ func createItemHandler(db *sql.DB, ctx *Context) func(http.ResponseWriter, *http
 			req.ParseForm()
 			itemName := req.FormValue("name")
 			itemKey := req.FormValue("key")
-			_, err := db.Query("INSERT INTO items (name, key, userid, isowned) VALUES ($1, $2, $3, false)", itemName, itemKey, ctx.UserID)
+			_, err := db.Query("INSERT INTO items (name, key, userid, isowned) VALUES ($1, $2, $3, FALSE)", itemName, itemKey, ctx.UserID)
 			if err != nil {
 				res.Write([]byte("There was an error creating that item: " + err.Error()))
 			} else {
