@@ -22,10 +22,10 @@ func viewItemsHandler(db *sql.DB, ctx *Context) func(http.ResponseWriter, *http.
 		var view string
 		if ownedQuery == "true" {
 			view = "owned"
-			querySuff = " AND isowned=TRUE"
+			querySuff = " AND isowned='t'"
 		} else if ownedQuery == "false" {
 			view = "notowned"
-			querySuff = " AND isowned=FALSE"
+			querySuff = " AND isowned='f'"
 		} else {
 			view = "all"
 		}
