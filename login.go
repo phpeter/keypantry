@@ -56,7 +56,10 @@ func loginHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
 				http.SetCookie(res, c)
 				// insert session row in to table
 				timestamp := time.Now()
-				_, err := db.Query("INSERT INTO usersession (SessionKey, UserID, LoginTime, LastSeenTime) VALUES ($1, $2, $3, $3)", key, userID, timestamp)
+
+				rows, err := db.Query("INSERT INTO usersession (SessionKey, UserID, LoginTime, LastSeenTime) VALUES ($1, $2, $3, $3)", key, userID, timestamp)
+				defer rows.Close()
+
 				if err != nil {
 					res.Write([]byte("Error! " + err.Error()))
 				} else {
@@ -85,7 +88,9 @@ func logoutHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
 		sessionKey := c.Value
 
 		// delete  session key from db
-		_, err = db.Query("DELETE FROM usersession WHERE sessionkey=$1", sessionKey)
+		rows, err := db.Query("DELETE FROM usersession WHERE sessionkey=$1", sessionKey)
+		defer rows.Close()
+
 		if err != nil {
 			log.Print("Error deleting session from DB: " + err.Error())
 		}

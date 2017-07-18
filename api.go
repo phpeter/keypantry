@@ -29,6 +29,7 @@ func apiHandler(db *sql.DB) func(res http.ResponseWriter, req *http.Request) {
 		} else {
 
 			row := db.QueryRow("SELECT id FROM users WHERE username=$1", username)
+
 			var userID int
 			err := row.Scan(&userID)
 
@@ -40,7 +41,8 @@ func apiHandler(db *sql.DB) func(res http.ResponseWriter, req *http.Request) {
 
 			log.Print("user id is " + string(userID))
 
-			_, err = db.Query("UPDATE items SET isOwned = NOT isOwned WHERE userID=$1 AND key=$2", userID, keyPressed)
+			rows, err := db.Query("UPDATE items SET isOwned = NOT isOwned WHERE userID=$1 AND key=$2", userID, keyPressed)
+			defer rows.Close()
 			if err != nil {
 				log.Print(err)
 			}
