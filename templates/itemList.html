@@ -2,13 +2,13 @@
 {{ template "header" .Context }}
 
 
-<p>
+<div id="nav">
   <div class="btn-group" role="group" aria-label="Basic example">
     <a href="/item/list" class="btn btn-primary{{ if eq .View "all" }} active{{end}}">All</a>
     <a href="?owned=true" class="btn btn-primary{{ if eq .View "owned" }} active{{end}}">Owned</a>
     <a href="?owned=false" class="btn btn-primary{{ if eq .View "notowned" }} active{{end}}">Not Owned</a>
   </div>
-</p>
+</div>
 
 <table class="table">
 

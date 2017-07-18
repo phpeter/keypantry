@@ -78,7 +78,7 @@ func createItemHandler(db *sql.DB, ctx *Context) func(http.ResponseWriter, *http
 			if err != nil {
 				res.Write([]byte("There was an error creating that item: " + err.Error()))
 			} else {
-				http.Redirect(res, req, "/item/list", http.StatusFound)
+				http.Redirect(res, req, req.Referer(), http.StatusFound)
 			}
 		case "GET":
 			tmpl.ExecuteTemplate(res, "createItem", nil)
@@ -95,7 +95,7 @@ func deleteItemHandler(db *sql.DB, ctx *Context) func(http.ResponseWriter, *http
 		if err != nil {
 			res.Write([]byte("There was an error deleting item number " + itemID + ": " + err.Error()))
 		} else {
-			http.Redirect(res, req, "/item/list", http.StatusFound)
+			http.Redirect(res, req, req.Referer(), http.StatusFound)
 		}
 	}
 }
@@ -111,12 +111,13 @@ func editItemHandler(db *sql.DB, ctx *Context) func(http.ResponseWriter, *http.R
 			req.ParseForm()
 			itemName := req.FormValue("name")
 			itemKey := req.FormValue("key")
+			referer := req.FormValue("referer")
 			rows, err := db.Query("UPDATE items SET name=$1, key=$2 WHERE id=$3 AND userid=$4", itemName, itemKey, itemID, ctx.UserID)
 			defer rows.Close()
 			if err != nil {
 				res.Write([]byte("There was an error updating that item: " + err.Error()))
 			} else {
-				http.Redirect(res, req, "/item/list", http.StatusFound)
+				http.Redirect(res, req, referer, http.StatusFound)
 			}
 		case "GET":
 			var item Item
@@ -128,9 +129,11 @@ func editItemHandler(db *sql.DB, ctx *Context) func(http.ResponseWriter, *http.R
 				tmpl.ExecuteTemplate(res, "editItem", struct {
 					Context *Context
 					Item    Item
+					Referer string
 				}{
 					Context: ctx,
 					Item:    item,
+					Referer: req.Referer(),
 				})
 			}
 
@@ -149,7 +152,7 @@ func toggleItemHandler(db *sql.DB, ctx *Context) func(http.ResponseWriter, *http
 		if err != nil {
 			res.Write([]byte("Error toggling item ownership: " + err.Error()))
 		} else {
-			http.Redirect(res, req, "/item/list", http.StatusTemporaryRedirect)
+			http.Redirect(res, req, req.Referer(), http.StatusTemporaryRedirect)
 		}
 
 	}

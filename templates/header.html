@@ -8,11 +8,30 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
 
+<style type="text/css">
+#header {
+  margin: 1em 0 0.5em;
+}
+#header div:last-child {
+  text-align: right;
+}
+#nav {
+  text-align: center;
+  margin: 0 0 0.5em;
+}
+</style>
+
 </head>
 <body>
 <div class="container">
-  <h1>KeyPantry</h1>
-  {{ if .LoggedIn }}
-    <a href="/logout" class="btn btn-secondary">Logout</a>
-  {{ end }}
+  <div class="row justify-content-between" id="header">
+    <div class="col-sm-4">
+      <h1>KeyPantry</h1>
+    </div>
+    <div class="col-sm-4">
+    {{ if .LoggedIn }}
+      <p><a href="/logout" class="btn btn-secondary">Logout</a></p>
+    {{ end }}
+    </div>
+  </div>
 {{ end }}
