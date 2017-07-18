@@ -10,9 +10,9 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var database_url = os.Getenv("DATABASE_URL")
+var databaseURL = os.Getenv("DATABASE_URL")
 var tmpl, tmplErr = template.ParseGlob("templates/*.html")
-var db, err = sql.Open("postgres", database_url)
+var db, err = sql.Open("postgres", databaseURL)
 
 func main() {
 

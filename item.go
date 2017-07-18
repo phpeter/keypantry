@@ -30,7 +30,7 @@ func viewItemsHandler(db *sql.DB, ctx *Context) func(http.ResponseWriter, *http.
 			view = "all"
 		}
 
-		items, err := db.Query("SELECT id, name, key, isowned FROM items WHERE userid=$1 ORDER BY id DESC"+querySuff, ctx.UserID)
+		items, err := db.Query("SELECT id, name, key, isowned FROM items WHERE userid=$1"+querySuff+" ORDER BY id DESC", ctx.UserID)
 		var itemList []Item
 
 		if err != nil {
