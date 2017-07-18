@@ -34,7 +34,7 @@
 
   {{ range .ItemList }}
   <tr>
-    <td><a href="/item/toggle/{{.ID}}" class="btn btn-sm btn-primary" {{if .IsOwned}}style="color:#0275d8;color:rgba(0,0,0,0)"{{end}}>✓</a></td>
+    <td><a href="/item/toggle/{{.ID}}" class="btn btn-sm btn-primary" {{if not .IsOwned}}style="color:#0275d8;color:rgba(0,0,0,0)"{{end}}>✓</a></td>
     <td>{{ .Name }}</td>
     <td>{{ .KeyChar }}</td>
     <td>
