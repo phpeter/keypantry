@@ -10,11 +10,13 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var databaseURL = os.Getenv("DATABASE_URL")
 var tmpl, tmplErr = template.ParseGlob("templates/*.html")
-var db, err = sql.Open("postgres", databaseURL)
 
 func main() {
+
+	var databaseURL = os.Getenv("DATABASE_URL")
+	var db, err = sql.Open("postgres", databaseURL)
+	defer db.Close()
 
 	port := os.Getenv("PORT")
 	// catch DB connection error
