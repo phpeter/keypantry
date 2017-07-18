@@ -1,10 +1,20 @@
 {{ define "itemList" }}
 {{ template "header" .Context }}
 
+
+<p>
+  <div class="btn-group" role="group" aria-label="Basic example">
+    <a href="/item/list" class="btn btn-primary{{ if eq .View "all" }} active{{end}}">All</a>
+    <a href="?owned=true" class="btn btn-primary{{ if eq .View "owned" }} active{{end}}">Owned</a>
+    <a href="?owned=false" class="btn btn-primary{{ if eq .View "notowned" }} active{{end}}">Not Owned</a>
+  </div>
+</p>
+
 <table class="table">
 
   <thead>
     <tr>
+      <th></th>
       <th>Name</th>
       <th>Key</th>
       <th></th>
@@ -15,6 +25,7 @@
 
   <tr>
     <form action="/item/create" method="post">
+    <td></td>
     <td><input type="text" class="form-control form-control-sm" name="name" id="name" placeholder="New item name" /></td>
     <td><input type="text" class="form-control form-control-sm" name="key" id="key" placeholder="New item key" /></td>
     <td><button type="submit" class="btn btn-primary btn-sm">Create</button></td>
@@ -23,6 +34,7 @@
 
   {{ range .ItemList }}
   <tr>
+    <td><a href="/item/toggle/{{.ID}}" class="btn btn-sm btn-primary">{{ if .IsOwned }}x{{else}}&nbsp;&nbsp;{{end}}</a></td>
     <td>{{ .Name }}</td>
     <td>{{ .KeyChar }}</td>
     <td>

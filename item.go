@@ -17,7 +17,20 @@ type Item struct {
 func viewItemsHandler(db *sql.DB, ctx *Context) func(http.ResponseWriter, *http.Request) {
 	return func(res http.ResponseWriter, req *http.Request) {
 
-		items, err := db.Query("SELECT id, name, key, isowned FROM items WHERE userid=$1", ctx.UserID)
+		ownedQuery := req.URL.Query().Get("owned")
+		var querySuff string
+		var view string
+		if ownedQuery == "true" {
+			view = "owned"
+			querySuff = " AND isowned=true"
+		} else if ownedQuery == "false" {
+			view = "notowned"
+			querySuff = " AND isowned=false"
+		} else {
+			view = "all"
+		}
+
+		items, err := db.Query("SELECT id, name, key, isowned FROM items WHERE userid=$1"+querySuff, ctx.UserID)
 		var itemList []Item
 
 		if err != nil {
@@ -34,15 +47,15 @@ func viewItemsHandler(db *sql.DB, ctx *Context) func(http.ResponseWriter, *http.
 
 		}
 
-		log.Print(itemList)
-
 		tmpl.ExecuteTemplate(res, "itemList",
 			struct {
 				Context  *Context
 				ItemList []Item
+				View     string
 			}{
 				Context:  ctx,
 				ItemList: itemList,
+				View:     view,
 			})
 	}
 }
@@ -56,7 +69,7 @@ func createItemHandler(db *sql.DB, ctx *Context) func(http.ResponseWriter, *http
 			req.ParseForm()
 			itemName := req.FormValue("name")
 			itemKey := req.FormValue("key")
-			_, err := db.Query("INSERT INTO items (name, key, userid) VALUES ($1, $2, $3)", itemName, itemKey, ctx.UserID)
+			_, err := db.Query("INSERT INTO items (name, key, userid, isowned) VALUES ($1, $2, $3, false)", itemName, itemKey, ctx.UserID)
 			if err != nil {
 				res.Write([]byte("There was an error creating that item: " + err.Error()))
 			} else {
@@ -115,5 +128,21 @@ func editItemHandler(db *sql.DB, ctx *Context) func(http.ResponseWriter, *http.R
 			}
 
 		}
+	}
+}
+
+func toggleItemHandler(db *sql.DB, ctx *Context) func(http.ResponseWriter, *http.Request) {
+	return func(res http.ResponseWriter, req *http.Request) {
+
+		itemID := getLastParam(req.URL.Path)
+
+		_, err := db.Query("UPDATE items SET isOwned = NOT isOwned WHERE userID=$1 AND id=$2", ctx.UserID, itemID)
+
+		if err != nil {
+			res.Write([]byte("Error toggling item ownership: " + err.Error()))
+		} else {
+			http.Redirect(res, req, "/item/list", http.StatusTemporaryRedirect)
+		}
+
 	}
 }

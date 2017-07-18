@@ -34,6 +34,7 @@ func main() {
 	http.HandleFunc("/item/create", auth(createItemHandler, db))
 	http.HandleFunc("/item/delete/", auth(deleteItemHandler, db))
 	http.HandleFunc("/item/edit/", auth(editItemHandler, db))
+	http.HandleFunc("/item/toggle/", auth(toggleItemHandler, db))
 
 	// redirect from root URL to login screen or item list
 	http.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
