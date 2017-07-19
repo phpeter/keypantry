@@ -40,8 +40,6 @@ func loginHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
 			pw := db.QueryRow("SELECT id, passwordHash FROM users WHERE username=$1", username)
 			err := pw.Scan(&userID, &userPasswordHash)
 
-			log.Print(username + " : " + passwordHash)
-
 			if err == sql.ErrNoRows {
 				res.Write([]byte("Error! Wrong username."))
 			} else if err != nil {
@@ -99,6 +97,66 @@ func logoutHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
 		http.SetCookie(res, c)
 
 		loginRedirect(res, req)
+
+	}
+}
+
+func registerHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
+	return func(res http.ResponseWriter, req *http.Request) {
+
+		switch req.Method {
+		case "GET":
+			tmpl.ExecuteTemplate(res, "register", nil)
+
+		case "POST":
+			req.ParseForm()
+
+			username := req.FormValue("username")
+			password := req.FormValue("password")
+			passwordConf := req.FormValue("passwordConf")
+
+			if password != passwordConf {
+				res.Write([]byte("Error, password and password confirmation do not match"))
+				return
+			}
+
+			// u := db.QueryRow("SELECT FROM users WHERE username=$1", username)
+			// err := u.Scan()
+			// log.Print(err)
+			// if err == nil {
+			// 	res.Write([]byte("Username already taken!"))
+			// 	return
+			// } else if err != sql.ErrNoRows {
+			// 	res.Write([]byte("Error checking username: " + err.Error()))
+			// 	return
+			// }
+
+			var userID int
+			row := db.QueryRow("INSERT INTO users (username, passwordhash) VALUES ($1, $2) RETURNING id", username, pwHash(password, username))
+			err := row.Scan(&userID)
+			if err != nil {
+				res.Write([]byte("Error creating account: " + err.Error()))
+				return
+			}
+
+			// generate session key
+			key := randKey(16)
+			// set session cookie
+			c := &http.Cookie{Name: "session", Value: key}
+			http.SetCookie(res, c)
+			// insert session row in to table
+			timestamp := time.Now()
+
+			rows, err := db.Query("INSERT INTO usersession (SessionKey, UserID, LoginTime, LastSeenTime) VALUES ($1, $2, $3, $3)", key, userID, timestamp)
+			if err != nil {
+				res.Write([]byte("Error! " + err.Error()))
+				return
+			}
+			defer rows.Close()
+
+			http.Redirect(res, req, "/item/list", http.StatusTemporaryRedirect)
+
+		}
 
 	}
 }

@@ -30,6 +30,7 @@ func main() {
 
 	http.HandleFunc("/login", loginHandler(db))
 	http.HandleFunc("/logout", logoutHandler(db))
+	http.HandleFunc("/register", registerHandler(db))
 
 	http.HandleFunc("/toggleitem/", apiHandler(db))
 
