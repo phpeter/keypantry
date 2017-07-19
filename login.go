@@ -7,6 +7,12 @@ import (
 	"time"
 )
 
+type user struct {
+	id           int
+	username     string
+	passwordHash string
+}
+
 func loginRedirect(res http.ResponseWriter, req *http.Request) {
 	http.Redirect(res, req, "/login", http.StatusTemporaryRedirect)
 }
@@ -27,25 +33,29 @@ func loginHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
 			}
 		}
 
+		var pageError string
+
 		switch req.Method {
 
 		case "POST":
+			// get username and pw from form
 			req.ParseForm()
 			username := req.FormValue("username")
 			password := req.FormValue("password")
+
+			// calculate the password hash
 			passwordHash := pwHash(password, username)
 
-			var userPasswordHash string
-			var userID int
-			pw := db.QueryRow("SELECT id, passwordHash FROM users WHERE username=$1", username)
-			err := pw.Scan(&userID, &userPasswordHash)
+			var user user
 
-			if err == sql.ErrNoRows {
-				res.Write([]byte("Error! Wrong username."))
+			pw := db.QueryRow("SELECT id, passwordHash FROM users WHERE username=$1", username)
+			err := pw.Scan(&user.id, &user.passwordHash)
+
+			if err == sql.ErrNoRows || passwordHash != user.passwordHash {
+				pageError = "Error! Bad credentials."
 			} else if err != nil {
-				res.Write([]byte("Error! " + err.Error()))
-			} else if passwordHash != userPasswordHash {
-				res.Write([]byte("Error! Wrong password."))
+				log.Print("Error looking up user for login: " + err.Error())
+				pageError = "An unknown error occurred, please try again."
 			} else {
 				// generate session key
 				key := randKey(16)
@@ -55,18 +65,21 @@ func loginHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
 				// insert session row in to table
 				timestamp := time.Now()
 
-				rows, err := db.Query("INSERT INTO usersession (SessionKey, UserID, LoginTime, LastSeenTime) VALUES ($1, $2, $3, $3)", key, userID, timestamp)
+				rows, err := db.Query("INSERT INTO usersession (SessionKey, UserID, LoginTime, LastSeenTime) VALUES ($1, $2, $3, $3)", key, user.id, timestamp)
 				defer rows.Close()
 
 				if err != nil {
-					res.Write([]byte("Error! " + err.Error()))
+					log.Print("Error assigning a user session " + err.Error())
+					pageError = "An unknown error occurred, please try again."
 				} else {
 					http.Redirect(res, req, "/item/list", http.StatusTemporaryRedirect)
+					return
 				}
 			}
 
+			fallthrough
 		case "GET":
-			tmpl.ExecuteTemplate(res, "login", nil)
+			tmpl.ExecuteTemplate(res, "login", struct{ Error string }{Error: pageError})
 
 		}
 	}
@@ -97,66 +110,6 @@ func logoutHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
 		http.SetCookie(res, c)
 
 		loginRedirect(res, req)
-
-	}
-}
-
-func registerHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
-	return func(res http.ResponseWriter, req *http.Request) {
-
-		switch req.Method {
-		case "GET":
-			tmpl.ExecuteTemplate(res, "register", nil)
-
-		case "POST":
-			req.ParseForm()
-
-			username := req.FormValue("username")
-			password := req.FormValue("password")
-			passwordConf := req.FormValue("passwordConf")
-
-			if password != passwordConf {
-				res.Write([]byte("Error, password and password confirmation do not match"))
-				return
-			}
-
-			// u := db.QueryRow("SELECT FROM users WHERE username=$1", username)
-			// err := u.Scan()
-			// log.Print(err)
-			// if err == nil {
-			// 	res.Write([]byte("Username already taken!"))
-			// 	return
-			// } else if err != sql.ErrNoRows {
-			// 	res.Write([]byte("Error checking username: " + err.Error()))
-			// 	return
-			// }
-
-			var userID int
-			row := db.QueryRow("INSERT INTO users (username, passwordhash) VALUES ($1, $2) RETURNING id", username, pwHash(password, username))
-			err := row.Scan(&userID)
-			if err != nil {
-				res.Write([]byte("Error creating account: " + err.Error()))
-				return
-			}
-
-			// generate session key
-			key := randKey(16)
-			// set session cookie
-			c := &http.Cookie{Name: "session", Value: key}
-			http.SetCookie(res, c)
-			// insert session row in to table
-			timestamp := time.Now()
-
-			rows, err := db.Query("INSERT INTO usersession (SessionKey, UserID, LoginTime, LastSeenTime) VALUES ($1, $2, $3, $3)", key, userID, timestamp)
-			if err != nil {
-				res.Write([]byte("Error! " + err.Error()))
-				return
-			}
-			defer rows.Close()
-
-			http.Redirect(res, req, "/item/list", http.StatusTemporaryRedirect)
-
-		}
 
 	}
 }
