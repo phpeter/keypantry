@@ -69,27 +69,23 @@ func main() {
 		log.Fatal(err)
 	}
 
-	server := http.NewServeMux()
+	http.Handle("/login", appHandler{context, loginHandler, false})
+	http.Handle("/logout", appHandler{context, logoutHandler, false})
+	http.Handle("/register", appHandler{context, registerHandler, false})
 
-	server.Handle("/login", appHandler{context, loginHandler, false})
+	http.Handle("/toggleitem/", appHandler{context, apiHandler, false})
 
-	server.Handle("/logout", appHandler{context, logoutHandler, false})
-	server.Handle("/register", appHandler{context, registerHandler, false})
-
-	server.Handle("/toggleitem/", appHandler{context, apiHandler, false})
-
-	server.Handle("/item/list", appHandler{context, viewItemsHandler, true})
-	server.Handle("/item/create", appHandler{context, createItemHandler, true})
-	server.Handle("/item/delete/", appHandler{context, deleteItemHandler, true})
-	server.Handle("/item/edit/", appHandler{context, editItemHandler, true})
-	server.Handle("/item/toggle/", appHandler{context, toggleItemHandler, true})
+	http.Handle("/item/list", appHandler{context, viewItemsHandler, true})
+	http.Handle("/item/create", appHandler{context, createItemHandler, true})
+	http.Handle("/item/delete/", appHandler{context, deleteItemHandler, true})
+	http.Handle("/item/edit/", appHandler{context, editItemHandler, true})
+	http.Handle("/item/toggle/", appHandler{context, toggleItemHandler, true})
 
 	// redirect from root URL to login screen or item list
-	server.Handle("/", appHandler{nil, func(ctx *appContext, res http.ResponseWriter, req *http.Request) (int, error) {
+	http.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
 		http.Redirect(res, req, "/item/list", http.StatusPermanentRedirect)
-		return http.StatusTemporaryRedirect, nil
-	}, false})
+	})
 
 	log.Print("Running on port " + port)
-	http.ListenAndServe(":"+port, server)
+	http.ListenAndServe(":"+port, nil)
 }
