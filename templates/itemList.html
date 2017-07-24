@@ -1,6 +1,29 @@
 {{ define "itemList" }}
-{{ template "header" .Context }}
+{{ template "header" .User }}
 
+<style type="text/css">
+table {
+    display: table;
+    width: 100%;
+    height: calc(100% - 18em);
+}
+table thead, table tbody {
+    float: left;
+    width: 100%;
+}
+table tbody {
+    overflow: auto;
+    height: 100%;
+}
+table tr {
+    width: 100%;
+    display: table;
+    text-align: left;
+}
+table th, table td {
+    width: 33%;
+}
+</style>
 
 <div id="nav">
   <div class="btn-group" role="group" aria-label="Basic example">
@@ -19,9 +42,6 @@
       <th>Key</th>
       <th></th>
     </tr>
-  </thead>
-
-  <tbody>
 
   <tr>
     <form action="/item/create" method="post">
@@ -32,19 +52,26 @@
     </form>
   </tr>
 
-  {{ range .ItemList }}
-  <tr>
-    <td><a href="/item/toggle/{{.ID}}" class="btn btn-sm btn-primary" {{if not .IsOwned}}style="color:#0275d8;color:rgba(0,0,0,0)"{{end}}>✓</a></td>
-    <td>{{ .Name }}</td>
-    <td>{{ .KeyChar }}</td>
-    <td>
-      <div class="btn-group">
-        <a href="/item/edit/{{.ID}}" class="btn btn-secondary btn-sm">Edit</a>
-        <a href="/item/delete/{{.ID}}" class="btn btn-danger btn-sm">Delete</a>
-      </div>
-    </td>
-  </tr>
-  {{ end }}
+  </thead>
+
+  <tbody>
+
+    <div style="overflow:scroll">
+      {{ range .ItemList }}
+      <tr>
+        <td><a href="/item/toggle/{{.ID}}" class="btn btn-sm btn-primary" {{if not .IsOwned}}style="color:#0275d8;color:rgba(0,0,0,0)"{{end}}>✓</a></td>
+        <td>{{ .Name }}</td>
+        <td>{{ .KeyChar }}</td>
+        <td>
+          <div class="btn-group">
+            <a href="/item/edit/{{.ID}}" class="btn btn-secondary btn-sm">Edit</a>
+            <a href="/item/delete/{{.ID}}" class="btn btn-danger btn-sm">Delete</a>
+          </div>
+        </td>
+      </tr>
+      {{ end }}
+    </div>
+
   </tbody>
 
 </table>
