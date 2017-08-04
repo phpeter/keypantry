@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS items (
 	isOwned BOOLEAN
 );
 
-create table usersession (
+create table IF NOT EXISTS usersession (
  SessionKey text primary key,
  UserID int not null REFERENCES users,
  LoginTime timestamp not null,
